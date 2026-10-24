@@ -17,7 +17,5 @@ lb config noauto \
     --win32-loader false \
     --apt-indices false \
     --apt-recommends false \
-    --debootstrap-options "--variant=minbase" \
     --zsync false \
     "${@}"
-

@@ -8,6 +8,9 @@ on:
 jobs:
   build-iso:
     runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm
+      options: --privileged
     permissions:
       contents: write
 
@@ -17,8 +20,8 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          apt-get update
+          apt-get install -y --no-install-recommends \
             live-build \
             debootstrap \
             squashfs-tools \
@@ -42,7 +45,7 @@ jobs:
 
       - name: Build Bootable ISO
         run: |
-          sudo ./scripts/build-iso.sh
+          ./scripts/build-iso.sh
 
       - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
@@ -52,4 +55,3 @@ jobs:
             output/*.iso
             output/*.sha256
           retention-days: 14
-
