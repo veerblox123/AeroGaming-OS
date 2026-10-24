@@ -1,0 +1,15 @@
+#!/bin/bash
+# AeroGaming OS GameMode End Hook
+# Restores desktop compositor and balanced power state
+
+# Relaunch picom if user session is active
+if [ -n "$DISPLAY" ] && [ -f "$HOME/.config/picom.conf" ]; then
+    picom -b --config "$HOME/.config/picom.conf" 2>/dev/null &
+fi
+
+# Reset CPU governor to schedutil
+command -v cpupower >/dev/null 2>&1 && cpupower frequency-set -g schedutil >/dev/null 2>&1 || true
+
+# Notify desktop
+command -v notify-send >/dev/null 2>&1 && notify-send -u low "⚡ GameMode Ended" "Restored Balanced Power Profile."
+

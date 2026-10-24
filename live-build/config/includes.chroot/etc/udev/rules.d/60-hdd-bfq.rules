@@ -1,0 +1,17 @@
+# ==============================================================================
+# AeroGaming OS - Storage I/O Scheduler Rules
+# Ensures smooth desktop and gaming responsiveness on 5400 RPM SATA HDDs
+# ==============================================================================
+
+# For Rotational mechanical HDDs (e.g. 1 TB SATA HDD in Lenovo V15 ADA):
+# BFQ (Budget Fair Queueing) guarantees interactive audio and desktop tasks
+# are never starved during game loading, asset streaming, or background downloads.
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/iosched/low_latency}="1"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/iosched/slice_idle}="0"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/read_ahead_kb}="128"
+
+# For SSD / NVMe drives (if user adds an M.2 NVMe SSD later):
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
+

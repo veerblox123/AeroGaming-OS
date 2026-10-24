@@ -1,0 +1,181 @@
+#!/bin/bash
+# ==============================================================================
+# AeroGaming OS - System Installer & Recovery Tool
+# Fast, Safe, Guided Installer for Lenovo V15 ADA and x86_64 Laptops
+# ==============================================================================
+
+set -e
+
+# Require root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This installer requires administrative privileges. Elevating..."
+    exec sudo "$0" "$@"
+fi
+
+CLEAR_SCREEN="clear"
+$CLEAR_SCREEN
+
+echo "================================================================================"
+echo "          AeroGaming OS (Lenovo V15 ADA Edition) - System Installer             "
+echo "================================================================================"
+echo " Detected System Architecture: $(uname -m)"
+echo " Boot Mode: $([ -d /sys/firmware/efi ] && echo 'UEFI (Recommended)' || echo 'Legacy BIOS')"
+echo " Memory: $(grep MemTotal /proc/meminfo | awk '{print int($2/1024)}') MB RAM"
+echo "================================================================================"
+echo ""
+
+# 1. Hardware Detection
+echo "[*] Scanning available storage drives..."
+DISKS=$(lsblk -d -p -n -l -o NAME,SIZE,MODEL | grep -v "loop" | grep -v "zram")
+echo "$DISKS"
+echo ""
+
+# 2. Select Disk
+read -p "Enter target disk to install onto (e.g. /dev/sda or /dev/nvme0n1): " TARGET_DISK
+
+if [ ! -b "$TARGET_DISK" ]; then
+    echo "[-] Error: Device $TARGET_DISK does not exist! Aborting."
+    exit 1
+fi
+
+echo ""
+echo "Selected disk: $TARGET_DISK"
+lsblk "$TARGET_DISK"
+echo ""
+
+# 3. SAFETY CONFIRMATION - NEVER ERASE AUTOMATICALLY
+echo "********************************************************************************"
+echo "                             WARNING: DATA LOSS RISK                            "
+echo " All existing data and partitions on $TARGET_DISK will be modified or erased!  "
+echo " If you have personal files on this disk, BACK THEM UP before proceeding.       "
+echo "********************************************************************************"
+read -p "Are you ABSOLUTELY sure you want to proceed? Type uppercase 'YES' to continue: " CONFIRM
+
+if [ "$CONFIRM" != "YES" ]; then
+    echo "Installation cancelled by user. No disks were modified."
+    exit 0
+fi
+
+echo ""
+echo "[1/6] Partitioning disk $TARGET_DISK..."
+
+# Determine EFI vs BIOS
+IS_EFI=0
+[ -d /sys/firmware/efi ] && IS_EFI=1
+
+# Wipe disk signature safely
+wipefs -a "$TARGET_DISK" >/dev/null 2>&1 || true
+
+if [ "$IS_EFI" -eq 1 ]; then
+    # GPT Partition table
+    parted -s "$TARGET_DISK" mklabel gpt
+    # Partition 1: EFI System Partition (512 MB)
+    parted -s "$TARGET_DISK" mkpart "ESP" fat32 1MiB 513MiB
+    parted -s "$TARGET_DISK" set 1 esp on
+    # Partition 2: Root Filesystem (Rest of disk)
+    parted -s "$TARGET_DISK" mkpart "AeroGaming_Root" ext4 513MiB 100%
+
+    partprobe "$TARGET_DISK"
+    sleep 2
+
+    # Identify partitions
+    if [[ "$TARGET_DISK" =~ "nvme" ]]; then
+        EFI_PART="${TARGET_DISK}p1"
+        ROOT_PART="${TARGET_DISK}p2"
+    else
+        EFI_PART="${TARGET_DISK}1"
+        ROOT_PART="${TARGET_DISK}2"
+    fi
+
+    echo "[2/6] Formatting partitions..."
+    mkfs.vfat -F32 -n "EFI" "$EFI_PART"
+    mkfs.ext4 -F -O fast_commit -L "AeroGaming" "$ROOT_PART"
+
+else
+    # MBR Partition table for legacy BIOS
+    parted -s "$TARGET_DISK" mklabel msdos
+    parted -s "$TARGET_DISK" mkpart primary ext4 1MiB 100%
+    parted -s "$TARGET_DISK" set 1 boot on
+
+    partprobe "$TARGET_DISK"
+    sleep 2
+
+    if [[ "$TARGET_DISK" =~ "nvme" ]]; then
+        ROOT_PART="${TARGET_DISK}p1"
+    else
+        ROOT_PART="${TARGET_DISK}1"
+    fi
+
+    echo "[2/6] Formatting partitions..."
+    mkfs.ext4 -F -O fast_commit -L "AeroGaming" "$ROOT_PART"
+fi
+
+# 4. Mount and Copy Filesystem
+echo "[3/6] Mounting target filesystem..."
+TARGET_MNT="/mnt/target_os"
+mkdir -p "$TARGET_MNT"
+mount -o noatime,commit=60 "$ROOT_PART" "$TARGET_MNT"
+
+if [ "$IS_EFI" -eq 1 ]; then
+    mkdir -p "$TARGET_MNT/boot/efi"
+    mount "$EFI_PART" "$TARGET_MNT/boot/efi"
+fi
+
+echo "[4/6] Installing OS image to $ROOT_PART (This may take several minutes on an HDD)..."
+# In live environment, copy from root /
+rsync -aAXv --delete \
+    --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/swapfile"} \
+    / "$TARGET_MNT/" 2>/dev/null || true
+
+# Generate fstab
+echo "[5/6] Generating /etc/fstab and configuring bootloader..."
+ROOT_UUID=$(blkid -s UUID -o value "$ROOT_PART")
+cat << EOF > "$TARGET_MNT/etc/fstab"
+# AeroGaming OS fstab
+UUID=$ROOT_UUID  /  ext4  noatime,lazytime,commit=60,errors=remount-ro  0  1
+EOF
+
+if [ "$IS_EFI" -eq 1 ]; then
+    EFI_UUID=$(blkid -s UUID -o value "$EFI_PART")
+    echo "UUID=$EFI_UUID  /boot/efi  vfat  umask=0077,noatime  0  2" >> "$TARGET_MNT/etc/fstab"
+fi
+
+# Create 2GB swapfile as physical emergency backstop (ZRAM handles normal swapping)
+echo "[*] Creating 2GB safety swapfile on disk..."
+dd if=/dev/zero of="$TARGET_MNT/swapfile" bs=1M count=2048 status=progress
+chmod 600 "$TARGET_MNT/swapfile"
+mkswap "$TARGET_MNT/swapfile"
+echo "/swapfile  none  swap  sw,pri=10  0  0" >> "$TARGET_MNT/etc/fstab"
+
+# Chroot to install GRUB
+echo "[6/6] Installing GRUB bootloader..."
+for dir in /dev /dev/pts /proc /sys /run; do
+    mount --bind "$dir" "$TARGET_MNT$dir"
+done
+
+if [ "$IS_EFI" -eq 1 ]; then
+    chroot "$TARGET_MNT" grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=AeroGaming --recheck
+else
+    chroot "$TARGET_MNT" grub-install --target=i386-pc "$TARGET_DISK" --recheck
+fi
+
+chroot "$TARGET_MNT" update-grub
+
+# Unmount
+echo "[*] Cleaning up mounts..."
+for dir in /dev/pts /dev /proc /sys /run; do
+    umount "$TARGET_MNT$dir" 2>/dev/null || true
+done
+if [ "$IS_EFI" -eq 1 ]; then
+    umount "$TARGET_MNT/boot/efi" 2>/dev/null || true
+fi
+umount "$TARGET_MNT" 2>/dev/null || true
+
+echo ""
+echo "================================================================================"
+echo "          AeroGaming OS INSTALLATION COMPLETED SUCCESSFULLY!                    "
+echo "================================================================================"
+echo " You may now reboot your Lenovo V15 ADA laptop and remove the USB installer."
+echo " Default optimizations (ZRAM, AMDGPU DPM, BFQ Scheduler) will be active."
+echo "================================================================================"
+

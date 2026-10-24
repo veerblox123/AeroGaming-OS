@@ -1,0 +1,40 @@
+# Lenovo V15 ADA Hardware Drivers & Firmware
+
+# AMD Picasso/Raven/Dali APU (Athlon Silver 3050U + Radeon Vega 3)
+firmware-amd-graphics
+xserver-xorg-video-amdgpu
+libdrm-amdgpu1
+libgl1-mesa-dri
+libglx-mesa0
+libegl-mesa0
+libgbm1
+mesa-vulkan-drivers
+mesa-va-drivers
+mesa-vdpau-drivers
+vulkan-tools
+libvulkan1
+
+# Realtek Wi-Fi / Bluetooth (RTL8821CE / RTL8822CE)
+firmware-realtek
+firmware-linux
+firmware-linux-nonfree
+
+# Lenovo Laptop ACPI & Power Management
+cpufrequtils
+linux-cpupower
+acpi
+acpid
+tlp
+
+# Touchpad & Input
+xserver-xorg-input-libinput
+libinput-bin
+
+# Sound / Audio (AMD ACP Audio Coprocessor & HD Audio)
+alsa-utils
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+pavucontrol
+

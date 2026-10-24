@@ -1,0 +1,38 @@
+#!/bin/bash
+# ==============================================================================
+# AeroGaming OS - Lenovo V15 ADA Hardware Tweaks & Initialization
+# ==============================================================================
+
+# 1. Configure BFQ I/O scheduler for rotational HDDs
+for blk in /sys/block/sd*; do
+    if [ -f "$blk/queue/rotational" ] && [ "$(cat "$blk/queue/rotational")" = "1" ]; then
+        if grep -q bfq "$blk/queue/scheduler"; then
+            echo bfq > "$blk/queue/scheduler"
+            [ -f "$blk/queue/iosched/low_latency" ] && echo 1 > "$blk/queue/iosched/low_latency"
+            [ -f "$blk/queue/iosched/slice_idle" ] && echo 0 > "$blk/queue/iosched/slice_idle"
+        fi
+    fi
+done
+
+# 2. Check and configure Lenovo Battery Conservation Mode if on AC
+for cons_path in \
+    /sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode \
+    /sys/devices/platform/ideapad_acpi/conservation_mode; do
+    if [ -f "$cons_path" ]; then
+        # Default to conservation mode enabled on AC to protect battery longevity
+        echo 1 > "$cons_path" 2>/dev/null || true
+    fi
+done
+
+# 3. CPU Governor default
+if command -v cpupower >/dev/null 2>&1; then
+    cpupower frequency-set -g schedutil 2>/dev/null || cpupower frequency-set -g ondemand 2>/dev/null || true
+fi
+
+# 4. AMDGPU DPM level
+for card in /sys/class/drm/card*/device/power_dpm_force_performance_level; do
+    if [ -f "$card" ]; then
+        echo auto > "$card" 2>/dev/null || true
+    fi
+done
+

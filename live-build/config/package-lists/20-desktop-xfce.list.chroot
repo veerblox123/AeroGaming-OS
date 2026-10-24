@@ -1,0 +1,48 @@
+# AeroGaming OS - Ultra-Lightweight Desktop Environment (XFCE 4.18)
+
+# Core X11 & Display Server
+xorg
+xserver-xorg-core
+x11-xserver-utils
+x11-utils
+xinit
+
+# Display Manager
+lightdm
+lightdm-gtk-greeter
+
+# XFCE Core (Tuned, bloat-free)
+xfce4-session
+xfwm4
+xfce4-panel
+xfdesktop4
+xfce4-settings
+xfce4-terminal
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+xfce4-power-manager
+xfce4-screenshooter
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+tumbler
+
+# Compositor (Low-latency GLX backend)
+picom
+
+# Sleek Dark Gamer Themes & Icons
+arc-theme
+papirus-icon-theme
+fonts-dejavu-core
+fonts-liberation2
+fonts-noto-core
+
+# System Tray & Settings UI
+network-manager-gnome
+pavucontrol
+zenity
+yad
+mousepad
+gparted
+

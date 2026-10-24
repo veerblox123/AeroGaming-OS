@@ -1,0 +1,50 @@
+# AeroGaming OS - Core System & Kernel
+linux-image-amd64
+linux-headers-amd64
+live-boot
+live-config
+live-config-systemd
+systemd
+systemd-sysv
+systemd-timesyncd
+sudo
+policykit-1
+pkexec
+bash
+bash-completion
+coreutils
+findutils
+grep
+sed
+gawk
+curl
+wget
+tar
+gzip
+bzip2
+xz-utils
+zstd
+ca-certificates
+locales
+tzdata
+
+# Storage & File Systems (SATA HDD / NVMe / USB)
+e2fsprogs
+dosfstools
+ntfs-3g
+btrfs-progs
+parted
+gdisk
+util-linux
+
+# ZRAM & Low-Memory Optimization
+zram-tools
+
+# Networking Core
+network-manager
+iproute2
+iputils-ping
+wireless-tools
+wpasupplicant
+rfkill
+

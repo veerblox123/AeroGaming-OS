@@ -1,0 +1,9 @@
+#!/bin/bash
+# AeroGaming OS GameMode Start Hook
+# Disables desktop compositor to free GPU resources for gaming
+
+pkill -9 picom 2>/dev/null || true
+
+# Notify desktop
+command -v notify-send >/dev/null 2>&1 && notify-send -u low "🚀 AeroGaming Mode Active" "Athlon 3050U set to Performance. Vega 3 DPM set to High."
+

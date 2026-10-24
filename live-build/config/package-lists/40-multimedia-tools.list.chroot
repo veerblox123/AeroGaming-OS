@@ -1,0 +1,14 @@
+# AeroGaming OS - System Utilities, Browser & Installer
+
+# Web Browser (Lightweight & Hardware-Accelerated)
+firefox-esr
+
+# Graphical System Installer (Calamares)
+calamares
+calamares-settings-debian
+
+# Volume & Brightness Keys Support
+xbacklight
+brightnessctl
+playerctl
+

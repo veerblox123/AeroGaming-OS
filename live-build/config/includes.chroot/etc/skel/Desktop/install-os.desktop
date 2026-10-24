@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Install AeroGaming OS
+Comment=Install AeroGaming OS to Hard Drive or SSD
+Exec=xfce4-terminal -e "sudo /usr/local/bin/v15-installer"
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+

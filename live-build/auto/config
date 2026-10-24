@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+lb config noauto \
+    --mode debian \
+    --distribution bookworm \
+    --architectures amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --linux-flavours amd64 \
+    --linux-packages "linux-image" \
+    --bootloader grub-efi \
+    --binary-images iso-hybrid \
+    --iso-application "AeroGaming OS (Lenovo V15 ADA Edition)" \
+    --iso-publisher "AeroGaming Project" \
+    --iso-volume "AEROGAMING_V15" \
+    --memtest memtest86+ \
+    --win32-loader false \
+    --apt-indices false \
+    --apt-recommends false \
+    --debootstrap-options "--variant=minbase" \
+    --zsync false \
+    "${@}"
+

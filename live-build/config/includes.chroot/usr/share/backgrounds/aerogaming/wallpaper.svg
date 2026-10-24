@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Dark Background -->
+  <rect width="1920" height="1080" fill="url(#bg)" />
+
+  <!-- Subtle Geometric Grid Lines -->
+  <g stroke="#1e293b" stroke-width="1" opacity="0.3">
+    <line x1="0" y1="270" x2="1920" y2="270" />
+    <line x1="0" y1="540" x2="1920" y2="540" />
+    <line x1="0" y1="810" x2="1920" y2="810" />
+    <line x1="480" y1="0" x2="480" y2="1080" />
+    <line x1="960" y1="0" x2="960" y2="1080" />
+    <line x1="1440" y1="0" x2="1440" y2="1080" />
+  </g>
+
+  <!-- Central Glow Polygon -->
+  <polygon points="960,340 1200,540 960,740 720,540" fill="url(#glow)" />
+
+  <!-- Stylized Geometric Shield / Logo -->
+  <polygon points="960,380 1140,540 960,700 780,540" fill="none" stroke="url(#accent)" stroke-width="3" opacity="0.8" />
+  <polygon points="960,420 1090,540 960,660 830,540" fill="#0f172a" stroke="#0ea5e9" stroke-width="1.5" opacity="0.6" />
+
+  <!-- Hardware Badge Text -->
+  <text x="960" y="530" font-family="'Segoe UI', 'Ubuntu', sans-serif" font-size="34" font-weight="900" fill="#f8fafc" text-anchor="middle" letter-spacing="4">
+    AEROGAMING OS
+  </text>
+  <text x="960" y="565" font-family="'Segoe UI', 'Ubuntu', sans-serif" font-size="14" font-weight="600" fill="#38bdf8" text-anchor="middle" letter-spacing="6">
+    LENOVO V15 ADA EDITION
+  </text>
+  <text x="960" y="600" font-family="'Segoe UI', 'Ubuntu', sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="middle" letter-spacing="2">
+    AMD ATHLON SILVER 3050U • RADEON VEGA 3 • 4GB ZRAM ENGINE
+  </text>
+</svg>
+

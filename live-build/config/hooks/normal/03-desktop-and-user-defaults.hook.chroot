@@ -1,0 +1,28 @@
+#!/bin/bash
+# ==============================================================================
+# AeroGaming OS Build Hook: 03-desktop-and-user-defaults
+# ==============================================================================
+set -e
+
+echo "[Hook 03] Setting execution permissions on system utilities..."
+chmod +x /usr/local/bin/v15-gaming-center \
+         /usr/local/bin/v15-installer \
+         /usr/local/bin/v15-minecraft-setup \
+         /usr/local/bin/zram-setup \
+         /usr/local/bin/lenovo-tweaks \
+         /usr/local/bin/gamemode-start-hook \
+         /usr/local/bin/gamemode-end-hook 2>/dev/null || true
+
+# Configure LightDM Autologin for live session
+if [ -f /etc/lightdm/lightdm.conf ]; then
+    sed -i 's/^#autologin-user=.*/autologin-user=user/' /etc/lightdm/lightdm.conf
+    sed -i 's/^#autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
+fi
+
+# Clean apt caches to reduce ISO size
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+rm -rf /tmp/* /var/tmp/*
+
+echo "[Hook 03] Desktop and user defaults configured."
+

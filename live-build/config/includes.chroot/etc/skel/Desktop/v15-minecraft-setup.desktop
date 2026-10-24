@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Minecraft 4GB Optimizer
+Comment=Optimize Sodium, Lithium, and RAM for Minecraft Java
+Exec=/usr/local/bin/v15-minecraft-setup
+Icon=input-gaming
+Terminal=false
+StartupNotify=true
+

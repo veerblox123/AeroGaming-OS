@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Lenovo Gaming Control Center
+GenericName=Gaming Optimizer & Telemetry
+Comment=Hardware monitor, power profiles, and Minecraft optimization for Lenovo V15 ADA
+Exec=/usr/local/bin/v15-gaming-center
+Icon=utilities-system-monitor
+Categories=System;Settings;Game;
+Terminal=false
+StartupNotify=true
+

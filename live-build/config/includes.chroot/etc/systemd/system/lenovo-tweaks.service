@@ -1,0 +1,12 @@
+[Unit]
+Description=AeroGaming OS Lenovo V15 Hardware & I/O Scheduler Service
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/lenovo-tweaks
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

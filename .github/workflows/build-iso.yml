@@ -1,0 +1,55 @@
+name: Build AeroGaming OS ISO
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            live-build \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            isolinux \
+            syslinux-utils \
+            mtools \
+            dosfstools \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            rsync \
+            git \
+            curl \
+            ca-certificates
+
+      - name: Make Scripts Executable
+        run: |
+          chmod +x scripts/*.sh
+          chmod +x live-build/auto/config
+          chmod +x live-build/config/hooks/normal/*.hook.chroot 2>/dev/null || true
+
+      - name: Build Bootable ISO
+        run: |
+          sudo ./scripts/build-iso.sh
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AeroGamingOS-Lenovo-V15-ADA-amd64
+          path: |
+            output/*.iso
+            output/*.sha256
+          retention-days: 14
+

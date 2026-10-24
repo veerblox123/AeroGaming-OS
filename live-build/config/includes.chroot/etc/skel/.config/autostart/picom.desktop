@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=picom -b --config /etc/skel/.config/picom.conf
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Picom Compositor
+Comment=Ultra-low-latency GLX compositor
+

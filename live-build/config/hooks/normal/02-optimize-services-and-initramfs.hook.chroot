@@ -1,0 +1,31 @@
+#!/bin/bash
+# ==============================================================================
+# AeroGaming OS Build Hook: 02-optimize-services-and-initramfs
+# ==============================================================================
+set -e
+
+echo "[Hook 02] Disabling non-essential background services to maximize free RAM..."
+# Mask/disable printer, broadcast and cellular modems
+for s in cups cups-browsed avahi-daemon speech-dispatcher ModemManager; do
+    systemctl disable $s 2>/dev/null || true
+    systemctl mask $s 2>/dev/null || true
+done
+
+echo "[Hook 02] Enabling AeroGaming core performance services..."
+systemctl enable zram-setup.service 2>/dev/null || true
+systemctl enable lenovo-tweaks.service 2>/dev/null || true
+systemctl enable gamemoded.service 2>/dev/null || true
+
+echo "[Hook 02] Configuring initramfs for early AMDGPU and BFQ loading..."
+cat << 'EOF' >> /etc/initramfs-tools/modules
+amdgpu
+bfq
+zram
+zstd
+EOF
+
+# Update initramfs
+update-initramfs -u -k all || true
+
+echo "[Hook 02] Services and initramfs tuned."
+

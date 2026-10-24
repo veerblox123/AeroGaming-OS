@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Minecraft 4GB RAM Optimizer
+GenericName=Minecraft Mod & JVM Optimizer
+Comment=Configure Sodium, Lithium, and safe 2GB RAM limits for Minecraft on Athlon 3050U
+Exec=/usr/local/bin/v15-minecraft-setup
+Icon=input-gaming
+Categories=Game;Settings;
+Terminal=false
+StartupNotify=true
+
